@@ -3,8 +3,15 @@
 - name: Include master tasks
   include_tasks: master.yml
   when: "inventory_hostname in groups['master']"
+  notify:
+    - Reload systemd
+    - Restart service redis
+    - Enable service redis
 
 - name: Include slave tasks
   include_tasks: slave.yml
   when: "inventory_hostname in groups['slave']"
-
+  notify:
+    - Reload systemd
+    - Restart service redis
+    - Enable service redis

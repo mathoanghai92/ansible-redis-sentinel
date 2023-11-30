@@ -1,31 +1,32 @@
 ---
 # tasks file for roles/config-sentinel
 
-- name: Edit /etc/redis-sentinel.conf
-  ansible.builtin.blockinfile:
+- name: Change mode daemonize
+  ansible.builtin.lineinfile:
     path: /etc/redis-sentinel.conf
-    block: |
-      protected-mode no
-      port 26379
-      
-      daemonize yes
-      pidfile /var/run/redis-sentinel.pid
-      logfile /var/log/redis/sentinel.log
+    regexp: '^daemonize'
+    line: 'daemonize yes'
 
-      dir /tmp
-
-      sentinel monitor mymaster {{ hostvars[inventory_hostname].ansible_default_ipv4.address }} 6379 2
-      sentinel down-after-milliseconds mymaster 30000
-      acllog-max-len 128
-
-      sentinel parallel-syncs mymaster 1
-      sentinel failover-timeout mymaster 180000
-      sentinel deny-scripts-reconfig yes
-      SENTINEL resolve-hostnames no
-      SENTINEL announce-hostnames no
-      SENTINEL master-reboot-down-after-period mymaster 0
-      sentinel auth-pass mymaster basebs@
+- name: Replace Redis Sentinel configuration file with IP Master
+  ansible.builtin.lineinfile:
+    path: /etc/redis-sentinel.conf
+    regexp: '^sentinel monitor mymaster '
+    line: 'sentinel monitor mymaster {{ hostvars[inventory_hostname].ansible_default_ipv4.address }} 6379 2'
+  become: true
   with_items: "{{ groups['master'] }}"
+
+- name: Replace Redis Sentinel configuration auth-pass
+  ansible.builtin.lineinfile:
+    path: /etc/redis-sentinel.conf
+    regexp: '^# sentinel auth-pass '
+    line: 'sentinel auth-pass mymaster basebs@'
+  become: true
+  
+- name: Restart Redis Sentinel
+  ansible.builtin.systemd:
+    name: redis-sentinel
+    state: restarted
   notify:
-    - Restart sentinel
-    - Enable sentinel
+    - Reload systemd
+    - Restart service redis-sentinel
+    - Enable service redis-sentinel

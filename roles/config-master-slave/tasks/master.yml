@@ -24,3 +24,9 @@
     path: /etc/redis.conf
     regexp: '^requirepass'
     line: 'requirepass basebs@'
+
+- name: Notify handlers
+  notify:
+    - Reload systemd
+    - Restart service redis
+    - Enable service redis

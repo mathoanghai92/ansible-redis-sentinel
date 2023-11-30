@@ -1,13 +1,17 @@
 ---
 # handlers file for roles/config-sentinel
 
-- name: Restart sentinel
+- name: Reload systemd
   ansible.builtin.systemd:
-    name: redis-sentinel.service
+    daemon_reload: yes
+
+- name: Restart service redis-sentinel
+  ansible.builtin.systemd:
+    name: redis-sentinel
     state: restarted
 
-- name: Enable sentinel
+- name: Enable service redis-sentinel
   ansible.builtin.systemd:
-    name: redis-sentinel.service
+    name: redis-sentinel
     state: started
     enabled: yes
