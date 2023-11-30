@@ -1,0 +1,17 @@
+---
+# handlers file for roles/config-master-slave
+# Restart service redis
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Restart service redis
+  ansible.builtin.systemd:
+    name: redis
+    state: restarted
+
+- name: Enable service redis
+  ansible.builtin.systemd:
+    name: redis
+    state: started
+    enabled: yes

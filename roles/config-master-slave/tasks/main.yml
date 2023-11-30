@@ -1,0 +1,10 @@
+---
+# tasks file for roles/config-master-slave
+- name: Include master tasks
+  include_tasks: master.yml
+  when: "inventory_hostname in groups['master']"
+
+- name: Include slave tasks
+  include_tasks: slave.yml
+  when: "inventory_hostname in groups['slave']"
+

@@ -1,0 +1,13 @@
+---
+# handlers file for roles/config-sentinel
+
+- name: Restart sentinel
+  ansible.builtin.systemd:
+    name: redis-sentinel.service
+    state: restarted
+
+- name: Enable sentinel
+  ansible.builtin.systemd:
+    name: redis-sentinel.service
+    state: started
+    enabled: yes

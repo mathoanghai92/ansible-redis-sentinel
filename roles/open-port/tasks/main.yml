@@ -1,0 +1,17 @@
+- name: Open ports in firewall
+  ansible.builtin.firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+  with_items:
+    - 6379/tcp
+    - 26379/tcp
+
+- name: Reload firewall
+  ansible.builtin.systemd:
+    name: firewalld
+    state: reloaded
+
+# - name: Reload firewall
+#   ansible.builtin.firewalld:
+#     state: reloaded

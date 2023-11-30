@@ -1,0 +1,26 @@
+# Edit config redis master
+
+- name: Edit config redis master bindIp
+  ansible.builtin.lineinfile:
+    path: /etc/redis.conf
+    regexp: '^bind'
+    line: 'bind {{ hostvars[inventory_hostname].ansible_default_ipv4.address }}'
+  with_items: "{{ groups['master'] }}"
+
+- name: Disable protected mode in /etc/redis.conf
+  ansible.builtin.lineinfile:
+    path: /etc/redis.conf
+    regexp: '^protected-mode'
+    line: 'protected-mode no'
+
+- name: Change the port in /etc/redis.conf
+  ansible.builtin.lineinfile:
+    path: /etc/redis.conf
+    regexp: '^port'
+    line: 'port 6379'
+
+- name: Set requirepass in /etc/redis.conf
+  ansible.builtin.lineinfile:
+    path: /etc/redis.conf
+    regexp: '^requirepass'
+    line: 'requirepass basebs@'

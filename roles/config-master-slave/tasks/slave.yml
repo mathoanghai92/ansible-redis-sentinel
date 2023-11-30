@@ -1,0 +1,45 @@
+# Edit config redis slave
+
+- name: Edit config redis slave bindIp
+  ansible.builtin.lineinfile:
+    path: /etc/redis.conf
+    regexp: '^bind'
+    line: 'bind {{ hostvars[inventory_hostname].ansible_default_ipv4.address }}'
+  with_items: "{{ groups['slave'] }}"
+
+- name: Disable protected mode in /etc/redis.conf
+  ansible.builtin.lineinfile:
+    path: /etc/redis.conf
+    regexp: '^protected-mode'
+    line: 'protected-mode no'
+
+- name: Change the port in /etc/redis.conf
+  ansible.builtin.lineinfile:
+    path: /etc/redis.conf
+    regexp: '^port'
+    line: 'port 6379'
+
+- name: Set requirepass in /etc/redis.conf
+  ansible.builtin.lineinfile:
+    path: /etc/redis.conf
+    regexp: '^requirepass '
+    line: 'requirepass basebs@'
+
+- name: Set replicaof in /etc/redis.conf
+  ansible.builtin.lineinfile:
+    path: /etc/redis.conf
+    regexp: '^# replicaof'
+    line: 'replicaof {{ hostvars[item].ansible_default_ipv4.address }} 6379'
+  with_items: "{{ groups['master'] }}"
+
+- name: Set masterauth in /etc/redis.conf
+  ansible.builtin.lineinfile:
+    path: /etc/redis.conf
+    regexp: '^masterauth '
+    line: 'masterauth  basebs@'
+
+- name: Notify handlers
+  notify:
+    - Reload systemd
+    - Restart service redis
+    - Enable service redis

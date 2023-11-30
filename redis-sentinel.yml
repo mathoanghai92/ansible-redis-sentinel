@@ -1,0 +1,38 @@
+---
+# Deploy Redis Sentinel
+
+# Install redis on each node
+- hosts: all
+  become: yes
+  roles:
+    - install-redis
+
+# Open port for redis on all host and reload firewall
+- hosts: all
+  become: yes
+  roles:
+    - open-port
+
+# Edit config redis on master node and slave node
+- hosts: master
+  become: yes
+  roles:
+    - config-master-slave
+
+- hosts: slave
+  become: yes
+  roles:
+    - config-master-slave
+
+# After edit redis config then restart service redis
+# - hosts: all
+#   become: yes
+#   roles:
+#     - restart-service
+
+# Add key config security - all host
+- hosts: all
+  become: yes
+  roles:
+    - config-sentinel
+

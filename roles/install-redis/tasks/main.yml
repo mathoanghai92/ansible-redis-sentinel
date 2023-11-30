@@ -1,0 +1,27 @@
+---
+# tasks file for roles/install-redis
+
+- name: Copy Redis RPM to target server
+  copy:
+    src: files/redis-7.0.11-1.el8.remi.x86_64.rpm  # Update with the correct path
+    dest: /root/redis-7.0.11-1.el8.remi.x86_64.rpm
+
+- name: Install Redis from RPM
+  yum:
+    name: /root/redis-7.0.11-1.el8.remi.x86_64.rpm
+    state: present
+    disable_gpg_check: yes
+    
+# - name: Check Redis version command and display output
+#   ansible.builtin.shell:
+#     cmd: redis --version
+#   register: redis_version_output
+#   changed_when: false
+
+# - name: Display Redis version
+#   ansible.builtin.debug:
+#     var: redis_version_output.stdout_lines
+#   when: redis_version_output.rc == 0
+
+
+
